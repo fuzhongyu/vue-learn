@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>transmit</title>
+    <!--知识点： 1.插槽  2.非子父组件之间数据传递  3.vue生命周期钩子  4.作用域插槽  5.动态组件 6.v-once -->
+    <script type="text/javascript" src="vue.js"></script>
+</head>
+
+<body>
+<div id="transmit">
+    <item ref="one" :content="content1"><h1 slot="header">文件头部</h1></item>
+    <item ref="two" :content="content2"><h1 slot="foot">文件尾部</h1></item>
+    <p>===========作用域插槽===========</p>
+    <item-scope>
+        <template slot-scope="prop">
+            <li :key="prop.index">{{prop.item}}</li>
+        </template>
+    </item-scope>
+    <p>===========动态组件============</p>
+    <component :is="componentType"></component>
+    <button @click="changeComponent">改变组件</button>
+</div>
+
+
+<script type="text/javascript">
+
+    Vue.prototype.bus=new Vue();
+
+    var item={
+        props:['content'],
+        data(){
+            return {
+                msg: this.content
+            }
+        },
+        template: `<div>
+                        <slot name="header"></slot>
+                            <li @click="changeContent">
+                                {{msg}}
+                            </li>
+                        <slot name="foot"></slot>
+                    </div>`,
+        methods:{
+            changeContent: function () {
+                this.bus.$emit('change',this.msg);
+            }
+        },
+        //挂载的时候出发事件
+        mounted: function () {
+            //注意：bus是类的属性，所以当bus改变的时候，所以的对象都会触发这个事件，
+            // 而this代表的是触发事件的该对象（即事件里面的对象在改变），所以需要存储原来的this
+            var _this=this;
+            this.bus.$on('change',function (msg) {
+                _this.msg=msg;
+            })
+        }
+    };
+
+    var itemScope={
+        data(){
+            return {
+                itemList:['项目1','项目2']
+            }
+        },
+        template:`<ul>
+                     <slot v-for="(item,index) of itemList" :item="item" :ind="index"></slot>
+                  </ul>
+                  `
+    };
+
+    var dysnComponentOne={
+        template: '<div v-once>dyna component one</div>'
+    };
+
+    var dysnComponentTwo={
+        template: '<div v-once>dyna component two</div>'
+    };
+
+    var transmit=new Vue({
+        el:'#transmit',
+        components:{
+            Item: item,
+            ItemScope:itemScope,
+            DysnOne: dysnComponentOne,
+            DysnTwo: dysnComponentTwo
+        },
+        data:{
+            content1: '第一项',
+            content2: '第二项',
+            componentType: 'DysnOne'
+        },
+        methods:{
+            changeComponent: function () {
+                this.componentType=this.componentType=='DysnOne'?'DysnTwo':'DysnOne';
+            }
+        }
+    });
+
+</script>
+
+
+
+</body>
+</html>

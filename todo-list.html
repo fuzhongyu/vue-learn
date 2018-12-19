@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>todo-list</title>
+    <!--知识点：1.局部组件和全局组件定义  2.子父组件相互传值  3. 组件传值数据验证  -->
+    <script type="text/javascript" src="vue.js"></script>
+</head>
+
+<body>
+<div id="todo-list">
+    <input v-model="inputVal">
+    <button @click="addItem">添加</button>
+    <ul>
+        <li is="todo-item"
+            v-for="(item,index) of itemList"
+            :content="item"
+            :key="index"
+            :index="index"
+            @del-item="deleteItem"
+        >
+        </li>
+    </ul>
+
+    <ul ref="globeList">
+        <li ref="globeItem" is="todo-item-globe" content="全局组件" @click.native="jumpInfo"></li>
+    </ul>
+</div>
+
+
+<script type="text/javascript">
+
+    //全局组件
+    Vue.component('TodoItemGlobe',{
+        //对props数据进行验证
+        props:{
+            content:{
+                type: String,
+                validator: function (value) {
+                    return value.length<10;
+                }
+            }
+        },
+        template: '<li>{{content}}</li>'
+    })
+
+
+
+    //局部组件
+    var todoItem={
+        props:['content','index'],
+        template: '<li @click="del">{{content}}</li>',
+        methods:{
+            del: function () {
+                // $emit中不能使用驼峰命名（不能用大写）
+                this.$emit('del-item',this.index);
+            }
+        }
+    }
+
+
+    var todoList=new Vue({
+        el: '#todo-list',
+        data: {
+            inputVal: '',
+            itemList: ['项目1','项目2']
+        },
+        components:{
+            TodoItem : todoItem
+        },
+        methods:{
+            addItem: function () {
+                this.itemList.push(this.inputVal);
+                this.inputVal='';
+            },
+            deleteItem: function (index) {
+                this.itemList.splice(index,1);
+            },
+            jumpInfo: function () {
+                console.info(this.$refs.globeList);
+                console.info(this.$refs.globeItem);
+                alert(this.$refs.globeItem.content);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

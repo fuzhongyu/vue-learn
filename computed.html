@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>computed</title>
+    <!--知识点：1.侦听事件，方法   2.计算属性 ，计算属性get， set方法 -->
+    <script type="text/javascript" src="vue.js"></script>
+</head>
+
+<body>
+<div id="compu">
+    性：<input v-model="firstName">
+    <br>
+    名：<input v-model="lastName">
+    <br>
+    姓名：{{fullName}}
+</div>
+
+
+
+<script type="text/javascript">
+
+    var compu=new Vue({
+        el:'#compu',
+        data: {
+            firstName: '',
+            lastName: ''
+        },
+        computed:{
+            fullName: {
+                get: function () {
+                    return this.firstName+' '+this.lastName;
+                },
+                set: function (name) {
+                    var arr=name.split(' ');
+                    this.firstName=arr[0];
+                    this.lastName=arr[1];
+                }
+            }
+        },
+        watch:{
+            firstName: function () {
+                console.info('first name change');
+            }
+        }
+    });
+
+</script>
+
+
+
+</body>
+</html>

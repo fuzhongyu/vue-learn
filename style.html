@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>style</title>
+    <!--知识点： vue操作css样式-->
+    <script type="text/javascript" src="vue.js"></script>
+</head>
+
+<body>
+<div id="styl">
+    <span :class="{actived:activedFlag}" @click="changeStyle">{{content}}</span>
+    <br/>
+    <span :class="[activedCls]" @click="changeStyle2">{{content+'2'}}</span>
+    <br>
+    <span :style="[activedSty]" @click="changeStyle3">{{content+'3'}}</span>
+</div>
+
+
+<style type="text/css">
+    .actived{
+        color: red;
+    }
+
+</style>
+
+
+<script type="text/javascript">
+
+    var styl=new Vue({
+        el:'#styl',
+        data: {
+            activedFlag: false,
+            content: '样式绑定',
+            activedCls:'',
+            activedSty:{
+                color: ''
+            }
+        },
+        methods:{
+            changeStyle: function () {
+                this.activedFlag=!this.activedFlag;
+            },
+            changeStyle2: function () {
+                this.activedCls=this.activedCls==''?'actived':'';
+            },
+            changeStyle3: function () {
+                this.activedSty.color=this.activedSty.color==''?'red':'';
+                styl.$set(styl.activedSty,'font-size','larger');
+            }
+        }
+    });
+
+</script>
+
+
+
+</body>
+</html>
